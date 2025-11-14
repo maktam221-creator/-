@@ -1,0 +1,5 @@
+{
+  "name": "منشورات - Social Feed",
+  "description": "An application for public posts and user profiles, allowing users to share updates with images, like posts, and comment on them. It features a main feed and individual user profile pages.",
+  "requestFramePermissions": []
+}
