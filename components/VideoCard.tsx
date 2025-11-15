@@ -266,13 +266,12 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, creator, currentUser, user
                     />
                     <div>
                       <p className="font-bold text-lg">{creator.name}</p>
-                      <p className="text-sm text-slate-300">{formatNumber(creator.followers)} متابع</p>
                     </div>
                 </div>
                 {/* Tooltip */}
-                <div className="absolute bottom-full mb-2 right-1/2 translate-x-1/2 w-max px-3 py-1.5 bg-slate-900/80 backdrop-blur-sm text-white text-xs font-semibold rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300 pointer-events-none z-10">
+                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-max px-3 py-1.5 bg-slate-900/80 backdrop-blur-sm text-white text-xs font-semibold rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300 pointer-events-none z-10">
                     {`لدى ${creator.name} ${formatNumber(creator.followers)} متابع`}
-                    <div className="absolute top-full right-1/2 -translate-x-1/2 w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-slate-900/80"></div>
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-slate-900/80"></div>
                 </div>
             </div>
             

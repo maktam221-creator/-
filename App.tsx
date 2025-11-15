@@ -4,12 +4,13 @@ import Header from './components/Header';
 import Feed from './components/Feed';
 import Profile from './components/Profile';
 import VideosFeed from './components/VideosFeed';
+import { EyeIcon } from './components/icons';
 
 const MOCK_USERS: User[] = [
-  { id: 1, name: 'علياء سالم', avatar: 'https://picsum.photos/seed/user1/200', bio: 'مصورة فوتوغرافية ومحبة للقهوة.', followers: 1200, following: 340, profession: 'مصورة', country: 'الإمارات', qualification: 'بكالوريوس فنون', gender: 'أنثى' },
-  { id: 2, name: 'خالد الأحمد', avatar: 'https://picsum.photos/seed/user2/200', bio: 'مطور برمجيات وكاتب تقني.', followers: 850, following: 150, profession: 'مهندس برمجيات', country: 'السعودية', qualification: 'ماجستير علوم الحاسب', gender: 'ذكر' },
-  { id: 3, name: 'نورة عبدالله', avatar: 'https://picsum.photos/seed/user3/200', bio: 'فنانة تشكيلية، أعشق الألوان والطبيعة.', followers: 2500, following: 500, profession: 'فنانة', country: 'الكويت', qualification: 'دبلوم فنون تشكيلية', gender: 'أنثى' },
-  { id: 4, name: 'سلطان فهد', avatar: 'https://picsum.photos/seed/user4/200', bio: 'رياضي ومدرب لياقة بدنية.', followers: 5000, following: 80, profession: 'مدرب لياقة', country: 'قطر', qualification: 'شهادة تدريب دولية', gender: 'ذكر' },
+  { id: 1, name: 'علياء سالم', avatar: 'https://picsum.photos/seed/user1/200', bio: 'مصورة فوتوغرافية ومحبة للقهوة.', followers: 1200, following: 340, profession: 'مصورة', country: 'الإمارات', qualification: 'بكالوريوس فنون', gender: 'أنثى', profileViews: 2500 },
+  { id: 2, name: 'خالد الأحمد', avatar: 'https://picsum.photos/seed/user2/200', bio: 'مطور برمجيات وكاتب تقني.', followers: 850, following: 150, profession: 'مهندس برمجيات', country: 'السعودية', qualification: 'ماجستير علوم الحاسب', gender: 'ذكر', profileViews: 1800 },
+  { id: 3, name: 'نورة عبدالله', avatar: 'https://picsum.photos/seed/user3/200', bio: 'فنانة تشكيلية، أعشق الألوان والطبيعة.', followers: 2500, following: 500, profession: 'فنانة', country: 'الكويت', qualification: 'دبلوم فنون تشكيلية', gender: 'أنثى', profileViews: 5300 },
+  { id: 4, name: 'سلطان فهد', avatar: 'https://picsum.photos/seed/user4/200', bio: 'رياضي ومدرب لياقة بدنية.', followers: 5000, following: 80, profession: 'مدرب لياقة', country: 'قطر', qualification: 'شهادة تدريب دولية', gender: 'ذكر', profileViews: 12000 },
 ];
 
 const MOCK_POSTS: Post[] = [
@@ -93,6 +94,57 @@ const MOCK_VIDEOS: Video[] = [
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 28).toISOString(),
   },
 ];
+
+interface SidebarProps {
+  currentUser: User;
+  users: User[];
+  following: number[];
+  onToggleFollow: (userId: number) => void;
+  onViewProfile: (userId: number) => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ currentUser, users, following, onToggleFollow, onViewProfile }) => {
+  const suggestedUsers = users.filter(user => user.id !== currentUser.id && !following.includes(user.id)).slice(0, 5);
+
+  return (
+    <div className="space-y-6 sticky top-24">
+      <div className="bg-slate-800 rounded-lg shadow-lg p-4">
+        <div className="flex items-center space-x-3 space-x-reverse text-slate-300">
+            <EyeIcon className="w-6 h-6 text-indigo-400"/>
+            <span className="font-semibold">مشاهدات الملف الشخصي</span>
+        </div>
+        <p className="text-3xl font-bold text-white text-center mt-3">
+          {currentUser.profileViews?.toLocaleString('ar-EG') || 0}
+        </p>
+      </div>
+
+      {suggestedUsers.length > 0 && (
+        <div className="bg-slate-800 rounded-lg shadow-lg p-4">
+          <h3 className="font-bold text-lg text-white mb-4">اقتراحات للمتابعة</h3>
+          <div className="space-y-4">
+            {suggestedUsers.map(user => (
+              <div key={user.id} className="flex items-center justify-between">
+                <div className="flex items-center space-x-3 space-x-reverse cursor-pointer" onClick={() => onViewProfile(user.id)}>
+                  <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full object-cover" />
+                  <div>
+                    <p className="font-semibold text-white hover:underline">{user.name}</p>
+                    <p className="text-xs text-slate-400">{user.profession || 'مستخدم جديد'}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => onToggleFollow(user.id)}
+                  className="px-3 py-1 bg-indigo-600 text-white text-sm font-semibold rounded-full hover:bg-indigo-700 transition duration-200"
+                >
+                  متابعة
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 
 const App: React.FC = () => {
@@ -324,52 +376,67 @@ const App: React.FC = () => {
         users={users}
         onMarkAsRead={handleMarkNotificationsAsRead}
       />
-      <main className="max-w-2xl mx-auto px-4 pb-10">
-        {toastMessage && (
+      {toastMessage && (
           <div className="fixed top-20 right-1/2 translate-x-1/2 bg-green-500 text-white px-6 py-2 rounded-full shadow-lg z-50 animate-bounce">
             {toastMessage}
           </div>
-        )}
-        {view === 'feed' && (
-          <Feed 
-            posts={posts} 
-            users={users} 
-            currentUser={currentUser} 
-            onCreatePost={handleCreatePost}
-            onLikePost={handleLikePost}
-            onAddComment={handleAddComment}
-            onViewProfile={(userId) => handleNavigate('profile', userId)}
-            onSharePost={handleSharePost}
-          />
-        )}
-        {view === 'profile' && selectedUser && (
-          <Profile 
-            user={selectedUser} 
-            posts={posts} 
-            currentUser={currentUser}
-            users={users}
-            onLikePost={handleLikePost}
-            onAddComment={handleAddComment}
-            onViewProfile={(userId) => handleNavigate('profile', userId)}
-            onUpdateProfile={handleUpdateProfile}
-            onSharePost={handleSharePost}
-          />
-        )}
-        {view === 'videos' && (
-          <VideosFeed 
-            videos={videos}
-            users={users}
-            currentUser={currentUser}
-            following={following}
-            onLikeVideo={handleLikeVideo}
-            onAddVideoComment={handleAddVideoComment}
-            onToggleFollow={handleToggleFollow}
-            onViewProfile={(userId) => handleNavigate('profile', userId)}
-            onShareVideo={handleShareVideo}
-            onDeleteVideo={handleDeleteVideo}
-          />
-        )}
-      </main>
+      )}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-6">
+          <main className="md:col-span-2">
+            {view === 'feed' && (
+              <Feed 
+                posts={posts} 
+                users={users} 
+                currentUser={currentUser} 
+                onCreatePost={handleCreatePost}
+                onLikePost={handleLikePost}
+                onAddComment={handleAddComment}
+                onViewProfile={(userId) => handleNavigate('profile', userId)}
+                onSharePost={handleSharePost}
+              />
+            )}
+            {view === 'profile' && selectedUser && (
+              <Profile 
+                user={selectedUser} 
+                posts={posts} 
+                currentUser={currentUser}
+                users={users}
+                onLikePost={handleLikePost}
+                onAddComment={handleAddComment}
+                onViewProfile={(userId) => handleNavigate('profile', userId)}
+                onUpdateProfile={handleUpdateProfile}
+                onSharePost={handleSharePost}
+                isFollowing={following.includes(selectedUser.id)}
+                onToggleFollow={handleToggleFollow}
+              />
+            )}
+            {view === 'videos' && (
+              <VideosFeed 
+                videos={videos}
+                users={users}
+                currentUser={currentUser}
+                following={following}
+                onLikeVideo={handleLikeVideo}
+                onAddVideoComment={handleAddVideoComment}
+                onToggleFollow={handleToggleFollow}
+                onViewProfile={(userId) => handleNavigate('profile', userId)}
+                onShareVideo={handleShareVideo}
+                onDeleteVideo={handleDeleteVideo}
+              />
+            )}
+          </main>
+          <aside className="hidden md:block md:col-span-1">
+             <Sidebar
+                currentUser={currentUser}
+                users={users}
+                following={following}
+                onToggleFollow={handleToggleFollow}
+                onViewProfile={(userId) => handleNavigate('profile', userId)}
+              />
+          </aside>
+        </div>
+      </div>
     </div>
   );
 };

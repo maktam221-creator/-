@@ -9,6 +9,7 @@ export interface User {
   country?: string;
   profession?: string;
   qualification?: string;
+  profileViews?: number;
 }
 
 export interface Comment {

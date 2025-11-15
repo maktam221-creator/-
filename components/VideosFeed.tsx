@@ -23,7 +23,7 @@ const VideosFeed: React.FC<VideosFeedProps> = ({ videos, users, currentUser, fol
   const sortedVideos = [...videos].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-md mx-auto">
       {sortedVideos.map(video => {
         const creator = getCreator(video.creatorId);
         if (!creator) return null;

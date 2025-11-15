@@ -8,15 +8,18 @@ interface ProfileProps {
   posts: Post[];
   currentUser: User;
   users: User[];
+  isFollowing: boolean;
   onLikePost: (postId: number) => void;
   onAddComment: (postId: number, text: string) => void;
   onViewProfile: (userId: number) => void;
   onUpdateProfile: (userId: number, newProfileData: Partial<User>) => void;
   onSharePost: (postId: number, postContent: string) => void;
+  onToggleFollow: (userId: number) => void;
 }
 
-const Profile: React.FC<ProfileProps> = ({ user, posts, currentUser, users, onLikePost, onAddComment, onViewProfile, onUpdateProfile, onSharePost }) => {
+const Profile: React.FC<ProfileProps> = ({ user, posts, currentUser, users, isFollowing, onLikePost, onAddComment, onViewProfile, onUpdateProfile, onSharePost, onToggleFollow }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isHoveringFollow, setIsHoveringFollow] = useState(false);
   
   const [editedName, setEditedName] = useState(user.name);
   const [editedBio, setEditedBio] = useState(user.bio);
@@ -165,7 +168,32 @@ const Profile: React.FC<ProfileProps> = ({ user, posts, currentUser, users, onLi
                 <p className="font-bold text-xl text-white">{user.following}</p>
                 <p className="text-sm text-slate-400">متابَعون</p>
               </div>
+              {user.profileViews != null && (
+                <div className="text-center">
+                  <p className="font-bold text-xl text-white">{user.profileViews.toLocaleString('ar-EG')}</p>
+                  <p className="text-sm text-slate-400">مشاهدات الملف</p>
+                </div>
+              )}
             </div>
+
+            {currentUser.id !== user.id && (
+              <div className="mt-6 flex justify-center sm:justify-start">
+                <button
+                  onClick={() => onToggleFollow(user.id)}
+                  onMouseEnter={() => setIsHoveringFollow(true)}
+                  onMouseLeave={() => setIsHoveringFollow(false)}
+                  className={`px-6 py-2 rounded-full font-semibold transition-all duration-200 w-full sm:w-auto ${
+                    isFollowing
+                      ? (isHoveringFollow
+                        ? 'bg-red-600/90 text-white border border-red-500'
+                        : 'bg-slate-600 text-white')
+                      : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  }`}
+                >
+                  {isFollowing ? (isHoveringFollow ? 'إلغاء المتابعة' : 'تتابعه') : 'متابعة'}
+                </button>
+              </div>
+            )}
 
             {isEditing && (
                 <div className="flex justify-end space-x-3 space-x-reverse mt-6">
