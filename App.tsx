@@ -162,6 +162,32 @@ const Sidebar: React.FC<SidebarProps> = ({ currentUser, users, following, onTogg
   );
 };
 
+const RightSidebar: React.FC<{ users: User[], following: number[], onViewProfile: (userId: number) => void }> = ({ users, following, onViewProfile }) => {
+  const followingUsers = users.filter(user => following.includes(user.id));
+
+  return (
+    <div className="space-y-6 sticky top-24">
+      <div className="bg-slate-800 rounded-lg shadow-lg p-4">
+        <h3 className="font-bold text-lg text-white mb-4">تتابعهم</h3>
+        {followingUsers.length > 0 ? (
+          <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+            {followingUsers.map(user => (
+              <div key={user.id} className="flex items-center space-x-3 space-x-reverse cursor-pointer group" onClick={() => onViewProfile(user.id)}>
+                <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full object-cover" />
+                <div>
+                  <p className="font-semibold text-white group-hover:underline">{user.name}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+           <p className="text-slate-400 text-sm">عندما تتابع شخصًا ما، سيظهر هنا.</p>
+        )}
+      </div>
+    </div>
+  );
+};
+
 
 const App: React.FC = () => {
   const [users, setUsers] = useState<User[]>(MOCK_USERS);
@@ -397,18 +423,19 @@ const App: React.FC = () => {
             {toastMessage}
           </div>
       )}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-6">
-          <aside className="hidden md:block md:col-span-1">
-             <Sidebar
-                currentUser={currentUser}
+      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 py-6">
+          {/* Right Sidebar - Renders on the right in RTL */}
+          <aside className="hidden lg:block lg:col-span-1">
+             <RightSidebar
                 users={users}
                 following={following}
-                onToggleFollow={handleToggleFollow}
                 onViewProfile={(userId) => handleNavigate('profile', userId)}
               />
           </aside>
-          <main className="md:col-span-2">
+
+          {/* Main Content */}
+          <main className="md:col-span-2 lg:col-span-2">
             {view === 'feed' && (
               <Feed 
                 posts={posts} 
@@ -451,6 +478,17 @@ const App: React.FC = () => {
               />
             )}
           </main>
+          
+           {/* Left Sidebar - Renders on the left in RTL */}
+           <aside className="hidden md:block md:col-span-1 lg:col-span-1">
+             <Sidebar
+                currentUser={currentUser}
+                users={users}
+                following={following}
+                onToggleFollow={handleToggleFollow}
+                onViewProfile={(userId) => handleNavigate('profile', userId)}
+              />
+          </aside>
         </div>
       </div>
     </div>
