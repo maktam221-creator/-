@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { User, Notification } from '../types';
-import { HomeIcon, BellIcon, SearchIcon, VideoCameraIcon, UserIcon } from './icons';
+import { HomeIcon, BellIcon, SearchIcon, VideoCameraIcon, UserIcon, ChatIcon } from './icons';
 
 interface HeaderProps {
   currentUser: User;
@@ -8,9 +8,10 @@ interface HeaderProps {
   notifications: Notification[];
   users: User[];
   onMarkAsRead: () => void;
+  onShowToast: (message: string) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ currentUser, onNavigate, notifications, users, onMarkAsRead }) => {
+const Header: React.FC<HeaderProps> = ({ currentUser, onNavigate, notifications, users, onMarkAsRead, onShowToast }) => {
     const [isPanelOpen, setIsPanelOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchResults, setSearchResults] = useState<User[]>([]);
@@ -115,6 +116,9 @@ const Header: React.FC<HeaderProps> = ({ currentUser, onNavigate, notifications,
             </button>
             <button onClick={() => onNavigate('videos')} className="text-slate-300 hover:text-indigo-400 transition p-2 rounded-full">
               <VideoCameraIcon className="w-7 h-7" />
+            </button>
+            <button onClick={() => onShowToast('ميزة الدردشة قادمة قريباً!')} className="text-slate-300 hover:text-indigo-400 transition p-2 rounded-full">
+              <ChatIcon className="w-7 h-7" />
             </button>
             <button onClick={() => onNavigate('profile', currentUser.id)} className="text-slate-300 hover:text-indigo-400 transition p-2 rounded-full">
               <UserIcon className="w-7 h-7" />
