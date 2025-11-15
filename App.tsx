@@ -109,13 +109,29 @@ const Sidebar: React.FC<SidebarProps> = ({ currentUser, users, following, onTogg
   return (
     <div className="space-y-6 sticky top-24">
       <div className="bg-slate-800 rounded-lg shadow-lg p-4">
-        <div className="flex items-center space-x-3 space-x-reverse text-slate-300">
-            <EyeIcon className="w-6 h-6 text-indigo-400"/>
-            <span className="font-semibold">مشاهدات الملف الشخصي</span>
+        <div 
+          className="flex flex-col items-center text-center cursor-pointer group"
+          onClick={() => onViewProfile(currentUser.id)}
+        >
+          <img 
+            src={currentUser.avatar} 
+            alt={currentUser.name} 
+            className="w-20 h-20 rounded-full object-cover border-4 border-slate-700 group-hover:border-indigo-500 transition"
+          />
+          <h2 className="text-xl font-bold text-white mt-3 group-hover:text-indigo-400 transition">{currentUser.name}</h2>
+          <p className="text-sm text-slate-400 mt-1">{currentUser.profession || 'مستخدم'}</p>
         </div>
-        <p className="text-3xl font-bold text-white text-center mt-3">
-          {currentUser.profileViews?.toLocaleString('ar-EG') || 0}
-        </p>
+        <div className="mt-4 pt-4 border-t border-slate-700">
+          <div className="flex items-center justify-between text-slate-300">
+            <div className="flex items-center space-x-2 space-x-reverse">
+              <EyeIcon className="w-5 h-5 text-indigo-400"/>
+              <span className="font-semibold text-sm">مشاهدات الملف</span>
+            </div>
+            <span className="font-bold text-lg text-white">
+              {currentUser.profileViews?.toLocaleString('ar-EG') || 0}
+            </span>
+          </div>
+        </div>
       </div>
 
       {suggestedUsers.length > 0 && (
@@ -383,6 +399,15 @@ const App: React.FC = () => {
       )}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 py-6">
+          <aside className="hidden md:block md:col-span-1">
+             <Sidebar
+                currentUser={currentUser}
+                users={users}
+                following={following}
+                onToggleFollow={handleToggleFollow}
+                onViewProfile={(userId) => handleNavigate('profile', userId)}
+              />
+          </aside>
           <main className="md:col-span-2">
             {view === 'feed' && (
               <Feed 
@@ -426,15 +451,6 @@ const App: React.FC = () => {
               />
             )}
           </main>
-          <aside className="hidden md:block md:col-span-1">
-             <Sidebar
-                currentUser={currentUser}
-                users={users}
-                following={following}
-                onToggleFollow={handleToggleFollow}
-                onViewProfile={(userId) => handleNavigate('profile', userId)}
-              />
-          </aside>
         </div>
       </div>
     </div>
