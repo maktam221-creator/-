@@ -5,6 +5,10 @@ export interface User {
   bio: string;
   followers: number;
   following: number;
+  gender?: string;
+  country?: string;
+  profession?: string;
+  qualification?: string;
 }
 
 export interface Comment {
@@ -20,6 +24,19 @@ export interface Post {
   content: string;
   image?: string;
   likes: number[]; // Array of user IDs who liked the post
+  comments: Comment[];
+  timestamp: string;
+}
+
+export interface Video {
+  id: number;
+  creatorId: number;
+  title: string;
+  description: string;
+  thumbnail: string;
+  videoUrl: string;
+  views: number;
+  likes: number[]; // Array of user IDs
   comments: Comment[];
   timestamp: string;
 }

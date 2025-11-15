@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Post, User } from '../types';
 import PostCard from './PostCard';
-import { PencilIcon, CameraIcon } from './icons';
+import { PencilIcon, CameraIcon, BriefcaseIcon, AcademicCapIcon, GlobeAltIcon, UserIcon } from './icons';
 
 interface ProfileProps {
   user: User;
@@ -11,14 +11,21 @@ interface ProfileProps {
   onLikePost: (postId: number) => void;
   onAddComment: (postId: number, text: string) => void;
   onViewProfile: (userId: number) => void;
-  onUpdateProfile: (userId: number, newBio: string, newAvatar: string) => void;
+  onUpdateProfile: (userId: number, newProfileData: Partial<User>) => void;
   onSharePost: (postId: number, postContent: string) => void;
 }
 
 const Profile: React.FC<ProfileProps> = ({ user, posts, currentUser, users, onLikePost, onAddComment, onViewProfile, onUpdateProfile, onSharePost }) => {
   const [isEditing, setIsEditing] = useState(false);
+  
+  const [editedName, setEditedName] = useState(user.name);
   const [editedBio, setEditedBio] = useState(user.bio);
   const [editedAvatar, setEditedAvatar] = useState<string | null>(null);
+  const [editedGender, setEditedGender] = useState(user.gender || '');
+  const [editedCountry, setEditedCountry] = useState(user.country || '');
+  const [editedProfession, setEditedProfession] = useState(user.profession || '');
+  const [editedQualification, setEditedQualification] = useState(user.qualification || '');
+  
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const userPosts = posts
@@ -36,16 +43,32 @@ const Profile: React.FC<ProfileProps> = ({ user, posts, currentUser, users, onLi
   };
 
   const handleSave = () => {
-    onUpdateProfile(user.id, editedBio, editedAvatar || user.avatar);
+    onUpdateProfile(user.id, {
+        name: editedName,
+        bio: editedBio,
+        avatar: editedAvatar || user.avatar,
+        gender: editedGender,
+        country: editedCountry,
+        profession: editedProfession,
+        qualification: editedQualification,
+    });
     setIsEditing(false);
     setEditedAvatar(null);
   };
 
   const handleCancel = () => {
     setIsEditing(false);
+    setEditedName(user.name);
     setEditedBio(user.bio);
     setEditedAvatar(null);
+    setEditedGender(user.gender || '');
+    setEditedCountry(user.country || '');
+    setEditedProfession(user.profession || '');
+    setEditedQualification(user.qualification || '');
   };
+
+  const inputClass = "w-full bg-slate-700 text-white placeholder-slate-400 p-2 mt-1 rounded-lg border-2 border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500";
+  const labelClass = "text-sm font-medium text-slate-400";
 
   return (
     <div>
@@ -82,20 +105,54 @@ const Profile: React.FC<ProfileProps> = ({ user, posts, currentUser, users, onLi
             )}
           </div>
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-white">{user.name}</h1>
             {isEditing ? (
-              <textarea
-                value={editedBio}
-                onChange={(e) => setEditedBio(e.target.value)}
-                className="w-full bg-slate-700 text-white placeholder-slate-400 p-2 mt-2 rounded-lg border-2 border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                rows={3}
-                aria-label="السيرة الذاتية"
-              />
+              <div className="space-y-4">
+                 <div>
+                    <label htmlFor="name" className={labelClass}>الاسم</label>
+                    <input type="text" id="name" value={editedName} onChange={(e) => setEditedName(e.target.value)} className={inputClass} />
+                </div>
+                <div>
+                    <label htmlFor="bio" className={labelClass}>السيرة الذاتية</label>
+                    <textarea id="bio" value={editedBio} onChange={(e) => setEditedBio(e.target.value)} className={inputClass} rows={3} />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="gender" className={labelClass}>النوع</label>
+                    <select id="gender" value={editedGender} onChange={(e) => setEditedGender(e.target.value)} className={inputClass}>
+                      <option value="">اختر...</option>
+                      <option value="ذكر">ذكر</option>
+                      <option value="أنثى">أنثى</option>
+                      <option value="أفضل عدم القول">أفضل عدم القول</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="country" className={labelClass}>الدولة</label>
+                    <input type="text" id="country" value={editedCountry} onChange={(e) => setEditedCountry(e.target.value)} className={inputClass} />
+                  </div>
+                  <div>
+                    <label htmlFor="profession" className={labelClass}>المهنة</label>
+                    <input type="text" id="profession" value={editedProfession} onChange={(e) => setEditedProfession(e.target.value)} className={inputClass} />
+                  </div>
+                  <div>
+                    <label htmlFor="qualification" className={labelClass}>المؤهل</label>
+                    <input type="text" id="qualification" value={editedQualification} onChange={(e) => setEditedQualification(e.target.value)} className={inputClass} />
+                  </div>
+                </div>
+              </div>
             ) : (
-              <p className="text-slate-400 mt-2 min-h-[3em]">{user.bio}</p>
+                <>
+                    <h1 className="text-3xl font-bold text-white">{user.name}</h1>
+                    <p className="text-slate-400 mt-2 min-h-[3em]">{user.bio}</p>
+                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm text-slate-300">
+                        {user.profession && <div className="flex items-center space-x-2 space-x-reverse"><BriefcaseIcon className="w-5 h-5 text-indigo-400 flex-shrink-0"/><span>{user.profession}</span></div>}
+                        {user.country && <div className="flex items-center space-x-2 space-x-reverse"><GlobeAltIcon className="w-5 h-5 text-indigo-400 flex-shrink-0"/><span>{user.country}</span></div>}
+                        {user.qualification && <div className="flex items-center space-x-2 space-x-reverse"><AcademicCapIcon className="w-5 h-5 text-indigo-400 flex-shrink-0"/><span>{user.qualification}</span></div>}
+                        {user.gender && <div className="flex items-center space-x-2 space-x-reverse"><UserIcon className="w-5 h-5 text-indigo-400 flex-shrink-0"/><span>{user.gender}</span></div>}
+                    </div>
+                </>
             )}
             
-            <div className="flex justify-center sm:justify-start space-x-6 space-x-reverse mt-4">
+            <div className="flex justify-center sm:justify-start space-x-6 space-x-reverse mt-6">
               <div className="text-center">
                 <p className="font-bold text-xl text-white">{userPosts.length}</p>
                 <p className="text-sm text-slate-400">منشورات</p>
@@ -111,7 +168,7 @@ const Profile: React.FC<ProfileProps> = ({ user, posts, currentUser, users, onLi
             </div>
 
             {isEditing && (
-                <div className="flex justify-end space-x-3 space-x-reverse mt-4">
+                <div className="flex justify-end space-x-3 space-x-reverse mt-6">
                     <button onClick={handleCancel} className="px-4 py-2 bg-slate-600 text-white font-semibold rounded-full hover:bg-slate-700 transition">
                         إلغاء
                     </button>

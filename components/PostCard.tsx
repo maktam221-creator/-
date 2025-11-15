@@ -15,6 +15,7 @@ interface PostCardProps {
 
 const PostCard: React.FC<PostCardProps> = ({ post, author, currentUser, onLikePost, onAddComment, onViewProfile, onSharePost, users }) => {
   const [commentText, setCommentText] = useState('');
+  const [commentsVisible, setCommentsVisible] = useState(false);
   const isLiked = post.likes.includes(currentUser.id);
 
   const handleCommentSubmit = (e: React.FormEvent) => {
@@ -58,39 +59,44 @@ const PostCard: React.FC<PostCardProps> = ({ post, author, currentUser, onLikePo
             </button>
             <span>{post.likes.length}</span>
           </div>
-          <div className="flex items-center space-x-2 space-x-reverse">
+          <button onClick={() => setCommentsVisible(!commentsVisible)} className="flex items-center space-x-2 space-x-reverse transition duration-200 hover:text-indigo-400">
             <CommentIcon className="w-6 h-6" />
             <span>{post.comments.length}</span>
-          </div>
+          </button>
           <button onClick={() => onSharePost(post.id, post.content)} className="flex items-center space-x-2 space-x-reverse transition duration-200 hover:text-green-500">
             <ShareIcon className="w-6 h-6" />
           </button>
         </div>
       </div>
       <div className="border-t border-slate-700 p-4">
-        {post.comments.map(comment => {
-          const commentAuthor = getCommentAuthor(comment.authorId);
-          return (
-            <div key={comment.id} className="flex items-start space-x-3 space-x-reverse mb-3">
-              <img src={commentAuthor?.avatar} alt={commentAuthor?.name} className="w-8 h-8 rounded-full object-cover mt-1 cursor-pointer" onClick={() => onViewProfile(commentAuthor?.id || 0)}/>
-              <div className="flex-1 bg-slate-700 rounded-lg p-2">
-                <p 
-                  className="font-semibold text-white text-sm cursor-pointer"
-                  onClick={() => onViewProfile(commentAuthor?.id || 0)}
-                >
-                  {commentAuthor?.name}
-                </p>
-                <p className="text-slate-300 text-sm">{comment.text}</p>
-              </div>
+        {commentsVisible && post.comments.length > 0 && (
+            <div className="mb-4">
+                {post.comments.map(comment => {
+                  const commentAuthor = getCommentAuthor(comment.authorId);
+                  return (
+                    <div key={comment.id} className="flex items-start space-x-3 space-x-reverse mb-3">
+                      <img src={commentAuthor?.avatar} alt={commentAuthor?.name} className="w-8 h-8 rounded-full object-cover mt-1 cursor-pointer" onClick={() => onViewProfile(commentAuthor?.id || 0)}/>
+                      <div className="flex-1 bg-slate-700 rounded-lg p-2">
+                        <p 
+                          className="font-semibold text-white text-sm cursor-pointer"
+                          onClick={() => onViewProfile(commentAuthor?.id || 0)}
+                        >
+                          {commentAuthor?.name}
+                        </p>
+                        <p className="text-slate-300 text-sm">{comment.text}</p>
+                      </div>
+                    </div>
+                  )
+                })}
             </div>
-          )
-        })}
-        <form onSubmit={handleCommentSubmit} className="flex items-center space-x-3 space-x-reverse mt-4">
+        )}
+        <form onSubmit={handleCommentSubmit} className="flex items-center space-x-3 space-x-reverse">
           <img src={currentUser.avatar} alt={currentUser.name} className="w-8 h-8 rounded-full object-cover" />
           <input
             type="text"
             value={commentText}
             onChange={(e) => setCommentText(e.target.value)}
+            onFocus={() => setCommentsVisible(true)}
             className="flex-1 bg-slate-700 text-white placeholder-slate-400 px-4 py-2 rounded-full border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             placeholder="اكتب تعليقاً..."
           />
